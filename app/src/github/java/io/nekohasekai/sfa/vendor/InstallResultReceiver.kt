@@ -5,11 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.util.Log
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.update.UpdateState
 
 class InstallResultReceiver : BroadcastReceiver() {
     companion object {
-        const val ACTION_INSTALL_COMPLETE = "io.nekohasekai.sfa.INSTALL_COMPLETE"
+        val ACTION_INSTALL_COMPLETE = BuildConfig.INSTALL_COMPLETE_ACTION
         private const val TAG = "InstallResultReceiver"
     }
 
