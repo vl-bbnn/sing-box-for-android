@@ -14,7 +14,6 @@ import java.io.Closeable
 
 class GitHubUpdateChecker : Closeable {
     companion object {
-        private const val RELEASES_URL = "https://api.github.com/repos/SagerNet/sing-box/releases"
         private const val METADATA_FILENAME = "SFA-version-metadata.json"
     }
 
@@ -66,7 +65,7 @@ class GitHubUpdateChecker : Closeable {
 
     private fun getReleases(): List<GitHubRelease> {
         val request = client.newRequest()
-        request.setURL(RELEASES_URL)
+        request.setURL(BuildConfig.GITHUB_RELEASES_URL)
         request.setHeader("Accept", "application/vnd.github.v3+json")
         request.setUserAgent(HTTPClient.userAgent)
 
