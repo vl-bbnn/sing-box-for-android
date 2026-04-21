@@ -40,6 +40,18 @@ fun getProps(propName: String): String {
     return ""
 }
 
+fun getRequiredConfigValue(propName: String): String {
+    val valueInEnv = System.getenv(propName)
+    if (!valueInEnv.isNullOrBlank()) {
+        return valueInEnv
+    }
+    val valueInProps = getProps(propName)
+    if (valueInProps.isNotBlank()) {
+        return valueInProps
+    }
+    throw GradleException("Missing required overlay configuration: $propName")
+}
+
 fun getVersionProps(propName: String): String {
     val propsFile = rootProject.file("version.properties")
     if (propsFile.exists()) {
@@ -52,6 +64,14 @@ fun getVersionProps(propName: String): String {
     }
     return ""
 }
+
+fun buildConfigString(value: String): String {
+    return "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+}
+
+val overlayApplicationId = getRequiredConfigValue("OVERLAY_APPLICATION_ID")
+val overlayGithubRepository = getRequiredConfigValue("OVERLAY_GITHUB_REPOSITORY")
+val installCompleteAction = "$overlayApplicationId.INSTALL_COMPLETE"
 
 android {
     namespace = "io.nekohasekai.sfa"
@@ -67,12 +87,15 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.nekohasekai.sfa"
+        applicationId = overlayApplicationId
         minSdk = 21
         targetSdk = 35
         versionCode = getVersionProps("VERSION_CODE").toInt()
         versionName = getVersionProps("VERSION_NAME")
         base.archivesName.set("SFA-${versionName}")
+        manifestPlaceholders["installCompleteAction"] = installCompleteAction
+        buildConfigField("String", "GITHUB_RELEASES_URL", buildConfigString("https://api.github.com/repos/$overlayGithubRepository/releases"))
+        buildConfigField("String", "INSTALL_COMPLETE_ACTION", buildConfigString(installCompleteAction))
     }
 
     signingConfigs {
