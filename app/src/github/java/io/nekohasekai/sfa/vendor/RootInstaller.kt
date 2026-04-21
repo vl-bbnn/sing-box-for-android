@@ -9,6 +9,7 @@ import android.os.ParcelFileDescriptor
 import com.topjohnwu.superuser.ipc.RootService
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.bg.IRootService
+import io.nekohasekai.sfa.bg.RootServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -55,7 +56,7 @@ object RootInstaller {
                 }
 
                 try {
-                    val intent = Intent(Application.application, Class.forName("io.nekohasekai.sfa.bg.RootServer"))
+                    val intent = Intent(Application.application, RootServer::class.java)
                     RootService.bind(intent, conn)
                 } catch (e: Throwable) {
                     continuation.resumeWithException(e)
