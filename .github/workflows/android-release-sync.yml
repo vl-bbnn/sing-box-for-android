@@ -384,7 +384,10 @@ jobs:
           version="${{ needs.detect_release.outputs.new_version }}"
           release_sha="${{ needs.build_apks.outputs.release_sha }}"
           notes_file="$RUNNER_TEMP/android-release-notes.md"
-          changelog_count="$(git rev-list --count "${previous_sha}..${source_sha}")"
+          changelog="$(
+            git log --reverse --format='%s' "${previous_sha}..${source_sha}" |
+              grep -Ev '^Bump version( |$)' || true
+          )"
           {
             echo "Android APK build for sing-box $version."
             echo
@@ -394,8 +397,8 @@ jobs:
             fi
             echo
             echo "## Changes"
-            if [[ "${changelog_count}" -gt 0 ]]; then
-              git log --reverse --format='- %s' "${previous_sha}..${source_sha}"
+            if [[ -n "${changelog}" ]]; then
+              printf '%s\n' "${changelog}" | sed 's/^/- /'
             else
               echo "- No upstream commits in this build interval."
             fi
