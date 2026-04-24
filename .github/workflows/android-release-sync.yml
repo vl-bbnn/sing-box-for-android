@@ -348,7 +348,7 @@ jobs:
 
   publish_github_release:
     needs: [detect_release, build_apks, sync_branches]
-    if: needs.detect_release.outputs.should_release == 'true' && needs.sync_branches.result != 'failure'
+    if: always() && needs.detect_release.outputs.should_release == 'true' && needs.build_apks.result == 'success' && needs.sync_branches.result != 'failure'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
