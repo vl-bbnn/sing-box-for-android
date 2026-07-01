@@ -12,14 +12,12 @@ on:
         required: true
         default: ":app:assembleOtherDebug :app:assembleOtherLegacyDebug"
       extra_tags:
-        description: Extra sing-box libbox tags, for example with_wlt
+        description: Extra sing-box libbox tags
         required: false
         default: ""
   push:
     branches:
       - overlay
-      - overlay+wlt
-      - wlt
     paths-ignore:
       - "**.md"
       - "fastlane/**"
