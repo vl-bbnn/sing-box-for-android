@@ -1,0 +1,86 @@
+name: Build LX APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      core_ref:
+        description: sing-box branch/tag/ref used for libbox
+        required: true
+        default: lx/overlay
+      gradle_tasks:
+        description: Gradle APK tasks
+        required: true
+        default: ":app:assembleOtherDebug :app:assembleOtherLegacyDebug"
+      extra_tags:
+        description: Extra sing-box libbox tags, for example with_wlt
+        required: false
+        default: ""
+  push:
+    branches:
+      - overlay
+      - overlay+wlt
+      - wlt
+    paths-ignore:
+      - "**.md"
+      - "fastlane/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lx-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SING_BOX_REPO_URL: https://github.com/vl-bbnn/sing-box.git
+  SING_BOX_REPO_REF: ${{ github.event.inputs.core_ref || 'lx/overlay' }}
+  ANDROID_GRADLE_TASKS: ${{ github.event.inputs.gradle_tasks || ':app:assembleOtherDebug :app:assembleOtherLegacyDebug' }}
+  SING_BOX_EXTRA_TAGS: ${{ github.event.inputs.extra_tags || '' }}
+  OVERLAY_APPLICATION_ID: ${{ secrets.OVERLAY_APPLICATION_ID }}
+  OVERLAY_GITHUB_REPOSITORY: ${{ github.repository }}
+
+jobs:
+  build:
+    name: apk from ${{ env.SING_BOX_REPO_REF }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout Android client
+        uses: actions/checkout@v5
+
+      - name: Resolve Go version
+        id: go-version
+        run: |
+          version="$(sed -n 's/^GO_VERSION=//p' version.properties)"
+          echo "version=${version#go}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ steps.go-version.outputs.version }}
+          cache: false
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4.0.1
+
+      - name: Install Android SDK components
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.0.13004108"
+
+      - name: Build libbox from LX and APKs
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+          ANDROID_NDK_HOME: ${{ env.ANDROID_HOME }}/ndk/28.0.13004108
+        run: ./scripts/build_lx_apks.sh
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: lx-apks-${{ github.event.inputs.core_ref || 'lx-overlay' }}
+          path: app/build/outputs/apk/**/*.apk
+          if-no-files-found: error

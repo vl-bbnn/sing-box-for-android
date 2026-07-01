@@ -11,6 +11,7 @@ import io.nekohasekai.libbox.ConnectionOwner
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.LocalDNSTransport
+import io.nekohasekai.libbox.NeighborUpdateListener
 import io.nekohasekai.libbox.NetworkInterfaceIterator
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.StringIterator
@@ -73,6 +74,15 @@ interface PlatformInterfaceWrapper : PlatformInterface {
 
     override fun closeDefaultInterfaceMonitor(listener: InterfaceUpdateListener) {
         DefaultNetworkMonitor.setListener(null)
+    }
+
+    override fun registerMyInterface(name: String) {
+    }
+
+    override fun startNeighborMonitor(listener: NeighborUpdateListener) {
+    }
+
+    override fun closeNeighborMonitor(listener: NeighborUpdateListener) {
     }
 
     override fun getInterfaces(): NetworkInterfaceIterator {
