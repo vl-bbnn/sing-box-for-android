@@ -36,7 +36,7 @@
         android:description="@string/xposed_description"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/overlay_application_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="31">

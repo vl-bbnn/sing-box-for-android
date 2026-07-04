@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.StatusMessage
 import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.MainActivity
 import io.nekohasekai.sfa.constant.Action
@@ -51,7 +52,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
     private val notificationBuilder by lazy {
         NotificationCompat.Builder(service, notificationChannel).setShowWhen(false).setOngoing(true)
-            .setContentTitle("sing-box").setOnlyAlertOnce(true)
+            .setContentTitle(BuildConfig.APPLICATION_NAME).setOnlyAlertOnce(true)
             .setSmallIcon(R.drawable.ic_menu)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentIntent(
@@ -94,7 +95,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         service.startForeground(
             notificationId,
             notificationBuilder
-                .setContentTitle(lastProfileName.takeIf { it.isNotBlank() } ?: "sing-box")
+                .setContentTitle(lastProfileName.takeIf { it.isNotBlank() } ?: BuildConfig.APPLICATION_NAME)
                 .setContentText(service.getString(contentTextId)).build(),
         )
     }

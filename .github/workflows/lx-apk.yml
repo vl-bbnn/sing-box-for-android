@@ -6,7 +6,7 @@ on:
       core_ref:
         description: sing-box branch/tag/ref used for libbox
         required: true
-        default: lx/overlay
+        default: ef1d02148a66158e23fc22d4e372f4f3bf855bc1
       gradle_tasks:
         description: Gradle APK tasks
         required: true
@@ -31,7 +31,7 @@ concurrency:
 
 env:
   SING_BOX_REPO_URL: https://github.com/vl-bbnn/sing-box.git
-  SING_BOX_REPO_REF: ${{ github.event.inputs.core_ref || 'lx/overlay' }}
+  SING_BOX_REPO_REF: ${{ github.event.inputs.core_ref || 'ef1d02148a66158e23fc22d4e372f4f3bf855bc1' }}
   ANDROID_GRADLE_TASKS: ${{ github.event.inputs.gradle_tasks || ':app:assembleOtherDebug :app:assembleOtherLegacyDebug' }}
   SING_BOX_EXTRA_TAGS: ${{ github.event.inputs.extra_tags || '' }}
   OVERLAY_APPLICATION_ID: ${{ secrets.OVERLAY_APPLICATION_ID }}

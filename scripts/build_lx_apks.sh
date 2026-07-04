@@ -7,8 +7,15 @@ build_root="${RUNNER_TEMP:-$android_root/build}/lx-apk-build"
 
 core_repo="${SING_BOX_REPO:-}"
 core_url="${SING_BOX_REPO_URL:-https://github.com/vl-bbnn/sing-box.git}"
-core_ref="${SING_BOX_REPO_REF:-lx/overlay}"
+core_ref="${SING_BOX_REPO_REF:-ef1d02148a66158e23fc22d4e372f4f3bf855bc1}"
 gradle_tasks="${ANDROID_GRADLE_TASKS:-:app:assembleOtherDebug :app:assembleOtherLegacyDebug}"
+
+version="$(sed -n 's/^VERSION_NAME=//p' "$android_root/version.properties")"
+version_ceiling="$(sed -n 's/^VERSION_NAME=//p' "$android_root/version-ceiling.properties")"
+if [[ "$version" != "$version_ceiling" ]]; then
+	echo "Android version $version does not match enforced ceiling $version_ceiling" >&2
+	exit 1
+fi
 
 if [[ -n "$core_repo" ]]; then
 	core_repo="$(cd "$core_repo" && pwd)"

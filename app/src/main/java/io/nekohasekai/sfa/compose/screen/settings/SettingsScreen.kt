@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.compose.topbar.OverrideTopBar
 import io.nekohasekai.sfa.database.Settings
@@ -263,7 +264,7 @@ fun SettingsScreen(navController: NavController) {
                         .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                         .clickable {
                             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
-                            intent.data = android.net.Uri.parse("https://sing-box.sagernet.org/")
+                            intent.data = android.net.Uri.parse(BuildConfig.APPLICATION_LINK)
                             context.startActivity(intent)
                         },
                     colors =
@@ -297,8 +298,7 @@ fun SettingsScreen(navController: NavController) {
                     Modifier
                         .clickable {
                             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
-                            intent.data =
-                                android.net.Uri.parse("https://github.com/SagerNet/sing-box-for-android")
+                            intent.data = android.net.Uri.parse(BuildConfig.SOURCE_LINK)
                             context.startActivity(intent)
                         },
                     colors =

@@ -78,7 +78,26 @@ current_go_version="$(read_prop "$origin_main_ref" GO_VERSION)"
 upstream_version="$(read_prop "$upstream_ref" VERSION_NAME)"
 upstream_version_code="$(read_prop "$upstream_ref" VERSION_CODE)"
 upstream_go_version="$(read_prop "$upstream_ref" GO_VERSION)"
+version_ceiling="$(awk -F= '$1 == "VERSION_NAME" { print $2; exit }' version-ceiling.properties)"
 release_tag="v$upstream_version"
+
+if ! python3 - "$upstream_version" "$version_ceiling" <<'PY'
+import sys
+
+def version(value):
+    core = value.split("-", 1)[0]
+    return tuple(int(part) for part in core.split("."))
+
+raise SystemExit(0 if version(sys.argv[1]) <= version(sys.argv[2]) else 1)
+PY
+then
+	echo "upstream version $upstream_version exceeds overlay ceiling $version_ceiling; skipping" >&2
+	write_output upstream_version "$upstream_version"
+	write_output version_ceiling "$version_ceiling"
+	write_output should_release false
+	write_output should_push false
+	exit 0
+fi
 
 overlay_commit_count="$(git rev-list --count "$origin_main_ref..$origin_overlay_ref")"
 upstream_changed=false

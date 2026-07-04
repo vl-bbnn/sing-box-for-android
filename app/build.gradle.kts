@@ -52,6 +52,14 @@ fun getRequiredConfigValue(propName: String): String {
     throw GradleException("Missing required overlay configuration: $propName")
 }
 
+fun getOptionalConfigValue(propName: String, defaultValue: String): String {
+    val valueInEnv = System.getenv(propName)
+    if (!valueInEnv.isNullOrBlank()) {
+        return valueInEnv
+    }
+    return getProps(propName).ifBlank { defaultValue }
+}
+
 fun getVersionProps(propName: String): String {
     val propsFile = rootProject.file("version.properties")
     if (propsFile.exists()) {
@@ -71,6 +79,17 @@ fun buildConfigString(value: String): String {
 
 val overlayApplicationId = getRequiredConfigValue("OVERLAY_APPLICATION_ID")
 val overlayGithubRepository = getRequiredConfigValue("OVERLAY_GITHUB_REPOSITORY")
+val overlayApplicationName = getOptionalConfigValue("OVERLAY_APPLICATION_NAME", "sing-box")
+val overlayApplicationLink =
+    getOptionalConfigValue("OVERLAY_APPLICATION_LINK", "https://sing-box.sagernet.org/")
+val overlayChangelogLink =
+    getOptionalConfigValue("OVERLAY_CHANGELOG_LINK", "https://sing-box.sagernet.org/changelog/")
+val overlayConfigurationLink =
+    getOptionalConfigValue("OVERLAY_CONFIGURATION_LINK", "https://sing-box.sagernet.org/configuration/")
+val overlaySourceLink =
+    getOptionalConfigValue("OVERLAY_SOURCE_LINK", "https://github.com/SagerNet/sing-box-for-android")
+val overlayReleasesLink =
+    getOptionalConfigValue("OVERLAY_RELEASES_LINK", "https://github.com/SagerNet/sing-box-for-android/releases")
 val installCompleteAction = "$overlayApplicationId.INSTALL_COMPLETE"
 
 android {
@@ -94,6 +113,13 @@ android {
         versionName = getVersionProps("VERSION_NAME")
         base.archivesName.set("SFA-${versionName}")
         manifestPlaceholders["installCompleteAction"] = installCompleteAction
+        resValue("string", "overlay_application_name", overlayApplicationName)
+        buildConfigField("String", "APPLICATION_NAME", buildConfigString(overlayApplicationName))
+        buildConfigField("String", "APPLICATION_LINK", buildConfigString(overlayApplicationLink))
+        buildConfigField("String", "CHANGELOG_LINK", buildConfigString(overlayChangelogLink))
+        buildConfigField("String", "CONFIGURATION_LINK", buildConfigString(overlayConfigurationLink))
+        buildConfigField("String", "SOURCE_LINK", buildConfigString(overlaySourceLink))
+        buildConfigField("String", "RELEASES_LINK", buildConfigString(overlayReleasesLink))
         buildConfigField("String", "GITHUB_RELEASES_URL", buildConfigString("https://api.github.com/repos/$overlayGithubRepository/releases"))
         buildConfigField("String", "INSTALL_COMPLETE_ACTION", buildConfigString(installCompleteAction))
     }

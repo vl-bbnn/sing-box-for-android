@@ -8,6 +8,11 @@ if [[ $# -lt 1 || $# -gt 2 ]]; then
 fi
 
 version="$1"
+version_ceiling="$(sed -n 's/^VERSION_NAME=//p' "$(dirname "$0")/../version-ceiling.properties")"
+if [[ "$version" != "$version_ceiling" ]]; then
+	echo "requested libbox version $version does not match enforced ceiling $version_ceiling" >&2
+	exit 1
+fi
 destination="${2:-$(pwd)/app/libs}"
 workspace_root="${RUNNER_TEMP:-$(pwd)/build}"
 build_root="$workspace_root/libbox-android-build"
