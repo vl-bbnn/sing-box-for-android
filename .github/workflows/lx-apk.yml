@@ -35,7 +35,7 @@ env:
   ANDROID_GRADLE_TASKS: ${{ github.event.inputs.gradle_tasks || ':app:assembleOtherDebug :app:assembleOtherLegacyDebug' }}
   SING_BOX_EXTRA_TAGS: ${{ github.event.inputs.extra_tags || '' }}
   OVERLAY_APPLICATION_ID: ${{ secrets.OVERLAY_APPLICATION_ID }}
-  VPN_CLIENT_IMPORT_SCHEME: ${{ vars.VPN_CLIENT_IMPORT_SCHEME }}
+  VPN_CLIENT_IMPORT_SCHEME: ${{ github.ref_name == 'stage' && vars.VPN_CLIENT_IMPORT_SCHEME_STAGE || vars.VPN_CLIENT_IMPORT_SCHEME_STABLE }}
   OVERLAY_GITHUB_REPOSITORY: ${{ github.repository }}
 
 jobs:
