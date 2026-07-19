@@ -232,7 +232,10 @@ class MainActivity :
             launchCustomTab(uri.toString())
             return
         }
-        if (uri.scheme == "sing-box" && uri.host == "import-remote-profile") {
+        if (
+            uri.scheme in setOf(BuildConfig.CLIENT_IMPORT_SCHEME, "sing-box") &&
+            uri.host == "import-remote-profile"
+        ) {
             try {
                 val profile = Libbox.parseRemoteProfileImportLink(uri.toString())
                 pendingImportProfile = Triple(profile.name, profile.host, profile.url)

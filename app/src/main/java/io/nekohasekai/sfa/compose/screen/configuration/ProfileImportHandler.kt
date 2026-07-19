@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.ProfileContent
+import io.nekohasekai.sfa.BuildConfig
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
@@ -111,8 +112,11 @@ class ProfileImportHandler(private val context: Context) {
 
     suspend fun parseQRCode(data: String): QRCodeParseResult = withContext(Dispatchers.IO) {
         try {
-            // Check if it's a sing-box remote profile import link
-            if (data.startsWith("sing-box://import-remote-profile")) {
+            // Check if it's a branded or legacy remote profile import link
+            if (
+                data.startsWith("${BuildConfig.CLIENT_IMPORT_SCHEME}://import-remote-profile") ||
+                data.startsWith("sing-box://import-remote-profile")
+            ) {
                 try {
                     val profileInfo = Libbox.parseRemoteProfileImportLink(data)
                     return@withContext QRCodeParseResult.RemoteProfile(
@@ -155,8 +159,11 @@ class ProfileImportHandler(private val context: Context) {
 
     suspend fun importFromQRCode(data: String): ImportResult = withContext(Dispatchers.IO) {
         try {
-            // Check if it's a sing-box remote profile import link
-            if (data.startsWith("sing-box://import-remote-profile")) {
+            // Check if it's a branded or legacy remote profile import link
+            if (
+                data.startsWith("${BuildConfig.CLIENT_IMPORT_SCHEME}://import-remote-profile") ||
+                data.startsWith("sing-box://import-remote-profile")
+            ) {
                 try {
                     val profileInfo = Libbox.parseRemoteProfileImportLink(data)
                     return@withContext importRemoteProfile(profileInfo.name, profileInfo.url)

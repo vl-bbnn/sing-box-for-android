@@ -52,6 +52,19 @@ fun getRequiredConfigValue(propName: String): String {
     throw GradleException("Missing required overlay configuration: $propName")
 }
 
+fun getRequiredEnvironmentValue(name: String): String {
+    return System.getenv(name)?.takeIf { it.isNotBlank() }
+        ?: throw GradleException("Missing required environment variable: $name")
+}
+
+fun getRequiredUriScheme(name: String): String {
+    val value = getRequiredEnvironmentValue(name)
+    if (!Regex("^[A-Za-z][A-Za-z0-9+.-]*$").matches(value)) {
+        throw GradleException("$name is not a valid URI scheme")
+    }
+    return value
+}
+
 fun getOptionalConfigValue(propName: String, defaultValue: String): String {
     val valueInEnv = System.getenv(propName)
     if (!valueInEnv.isNullOrBlank()) {
@@ -79,6 +92,7 @@ fun buildConfigString(value: String): String {
 
 val overlayApplicationId = getRequiredConfigValue("OVERLAY_APPLICATION_ID")
 val overlayGithubRepository = getRequiredConfigValue("OVERLAY_GITHUB_REPOSITORY")
+val clientImportScheme = getRequiredUriScheme("VPN_CLIENT_IMPORT_SCHEME")
 val overlayApplicationName = getOptionalConfigValue("OVERLAY_APPLICATION_NAME", "sing-box")
 val overlayApplicationLink =
     getOptionalConfigValue("OVERLAY_APPLICATION_LINK", "https://sing-box.sagernet.org/")
@@ -113,8 +127,10 @@ android {
         versionName = getVersionProps("VERSION_NAME")
         base.archivesName.set("SFA-${versionName}")
         manifestPlaceholders["installCompleteAction"] = installCompleteAction
+        manifestPlaceholders["clientImportScheme"] = clientImportScheme
         resValue("string", "overlay_application_name", overlayApplicationName)
         buildConfigField("String", "APPLICATION_NAME", buildConfigString(overlayApplicationName))
+        buildConfigField("String", "CLIENT_IMPORT_SCHEME", buildConfigString(clientImportScheme))
         buildConfigField("String", "APPLICATION_LINK", buildConfigString(overlayApplicationLink))
         buildConfigField("String", "CHANGELOG_LINK", buildConfigString(overlayChangelogLink))
         buildConfigField("String", "CONFIGURATION_LINK", buildConfigString(overlayConfigurationLink))
@@ -202,6 +218,7 @@ android {
         aidl = true
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     packaging {

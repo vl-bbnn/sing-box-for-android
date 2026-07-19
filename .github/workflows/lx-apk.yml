@@ -35,6 +35,7 @@ env:
   ANDROID_GRADLE_TASKS: ${{ github.event.inputs.gradle_tasks || ':app:assembleOtherDebug :app:assembleOtherLegacyDebug' }}
   SING_BOX_EXTRA_TAGS: ${{ github.event.inputs.extra_tags || '' }}
   OVERLAY_APPLICATION_ID: ${{ secrets.OVERLAY_APPLICATION_ID }}
+  VPN_CLIENT_IMPORT_SCHEME: ${{ vars.VPN_CLIENT_IMPORT_SCHEME }}
   OVERLAY_GITHUB_REPOSITORY: ${{ github.repository }}
 
 jobs:
@@ -66,6 +67,9 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4.0.1
+
+      - name: Validate overlay configuration
+        run: test -n "$VPN_CLIENT_IMPORT_SCHEME"
 
       - name: Install Android SDK components
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.0.13004108"
