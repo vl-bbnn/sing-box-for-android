@@ -25,6 +25,7 @@ env:
   UPSTREAM_BRANCH: main
   OVERLAY_BRANCH: overlay
   OVERLAY_APPLICATION_ID: ${{ secrets.OVERLAY_APPLICATION_ID }}
+  VPN_CLIENT_IMPORT_SCHEME: ${{ vars.VPN_CLIENT_IMPORT_SCHEME }}
   OVERLAY_GITHUB_REPOSITORY: ${{ github.repository }}
 
 jobs:
@@ -200,6 +201,7 @@ jobs:
           test -n "$LOCAL_PROPERTIES"
           test -n "$RELEASE_KEYSTORE_BASE64"
           test -n "$OVERLAY_APPLICATION_ID"
+          test -n "$VPN_CLIENT_IMPORT_SCHEME"
           test -n "$OVERLAY_GITHUB_REPOSITORY"
           printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > app/release.keystore
           test -f app/release.keystore
@@ -293,6 +295,7 @@ jobs:
           test -n "$LOCAL_PROPERTIES"
           test -n "$RELEASE_KEYSTORE_BASE64"
           test -n "$OVERLAY_APPLICATION_ID"
+          test -n "$VPN_CLIENT_IMPORT_SCHEME"
           printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > app/release.keystore
           if [[ -n "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64" ]]; then
             printf '%s' "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON_BASE64" | base64 --decode > service-account-credentials.json

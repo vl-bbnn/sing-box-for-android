@@ -52,6 +52,19 @@ fun getRequiredConfigValue(propName: String): String {
     throw GradleException("Missing required overlay configuration: $propName")
 }
 
+fun getRequiredEnvironmentValue(name: String): String {
+    return System.getenv(name)?.takeIf { it.isNotBlank() }
+        ?: throw GradleException("Missing required environment variable: $name")
+}
+
+fun getRequiredUriScheme(name: String): String {
+    val value = getRequiredEnvironmentValue(name)
+    if (!Regex("^[A-Za-z][A-Za-z0-9+.-]*$").matches(value)) {
+        throw GradleException("$name is not a valid URI scheme")
+    }
+    return value
+}
+
 fun getVersionProps(propName: String): String {
     val propsFile = rootProject.file("version.properties")
     if (propsFile.exists()) {
@@ -71,6 +84,7 @@ fun buildConfigString(value: String): String {
 
 val overlayApplicationId = getRequiredConfigValue("OVERLAY_APPLICATION_ID")
 val overlayGithubRepository = getRequiredConfigValue("OVERLAY_GITHUB_REPOSITORY")
+val clientImportScheme = getRequiredUriScheme("VPN_CLIENT_IMPORT_SCHEME")
 val installCompleteAction = "$overlayApplicationId.INSTALL_COMPLETE"
 
 android {
@@ -95,6 +109,8 @@ android {
         versionName = getVersionProps("VERSION_NAME")
         base.archivesName.set("SFA-${versionName}")
         manifestPlaceholders["installCompleteAction"] = installCompleteAction
+        manifestPlaceholders["clientImportScheme"] = clientImportScheme
+        buildConfigField("String", "CLIENT_IMPORT_SCHEME", buildConfigString(clientImportScheme))
         buildConfigField("String", "GITHUB_RELEASES_URL", buildConfigString("https://api.github.com/repos/$overlayGithubRepository/releases"))
         buildConfigField("String", "INSTALL_COMPLETE_ACTION", buildConfigString(installCompleteAction))
     }
@@ -177,6 +193,7 @@ android {
         aidl = true
         compose = true
         buildConfig = true
+        resValues = true
     }
 
     packaging {
